@@ -4,10 +4,16 @@
     xmlns:local="clr-namespace:Checkers"
     Title="Checkers" WindowStyle="ThreeDBorderWindow" MinWidth="800" MinHeight="680"  Width="800" Height="680" WindowStartupLocation="CenterScreen" >
 
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" >
-        <Border HorizontalAlignment="Left" VerticalAlignment="Top"  BorderBrush="Black" BorderThickness="2">
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Border HorizontalAlignment="Left" VerticalAlignment="Top"  BorderBrush="Black" BorderThickness="3">
             <Grid>
-            <Grid.ColumnDefinitions>
+                
+                <Grid.Resources>
+                    <SolidColorBrush x:Key="brush" Color="Black"/>
+                </Grid.Resources>
+                
+                <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30" />
                 <ColumnDefinition Width="50" />
                 <ColumnDefinition Width="50" />
                 <ColumnDefinition Width="50" />
@@ -27,47 +33,279 @@
                 <RowDefinition Height="50" />
                 <RowDefinition Height="50" />
                 <RowDefinition Height="50" />
+                <RowDefinition Height="35" />
             </Grid.RowDefinitions>
 
-            <Border Grid.Column="1" Grid.Row="0" Background="Black" />
-            <Border Grid.Column="3" Grid.Row="0" Background="Black" />
-            <Border Grid.Column="5" Grid.Row="0" Background="Black" />
-            <Border Grid.Column="7" Grid.Row="0" Background="Black" />
+            <Border Grid.Column="2" Grid.Row="0" Background="Black" />
+            <Border Grid.Column="4" Grid.Row="0" Background="Black" />
+            <Border Grid.Column="6" Grid.Row="0" Background="Black" />
+            <Border Grid.Column="8" Grid.Row="0" Background="Black" />
             
-            <Border Grid.Column="0" Grid.Row="1" Background="Black" />
-            <Border Grid.Column="2" Grid.Row="1" Background="Black" />
-            <Border Grid.Column="4" Grid.Row="1" Background="Black" />
-            <Border Grid.Column="6" Grid.Row="1" Background="Black" />
+            <Border Grid.Column="1" Grid.Row="1" Background="Black" />
+            <Border Grid.Column="3" Grid.Row="1" Background="Black" />
+            <Border Grid.Column="5" Grid.Row="1" Background="Black" />
+            <Border Grid.Column="7" Grid.Row="1" Background="Black" />
             
-            <Border Grid.Column="1" Grid.Row="2" Background="Black" />
-            <Border Grid.Column="3" Grid.Row="2" Background="Black" />
-            <Border Grid.Column="5" Grid.Row="2" Background="Black" />
-            <Border Grid.Column="7" Grid.Row="2" Background="Black" />
+            <Border Grid.Column="2" Grid.Row="2" Background="Black" />
+            <Border Grid.Column="4" Grid.Row="2" Background="Black" />
+            <Border Grid.Column="6" Grid.Row="2" Background="Black" />
+            <Border Grid.Column="8" Grid.Row="2" Background="Black" />
             
-            <Border Grid.Column="0" Grid.Row="3" Background="Black" />
-            <Border Grid.Column="2" Grid.Row="3" Background="Black" />
-            <Border Grid.Column="4" Grid.Row="3" Background="Black" />
-            <Border Grid.Column="6" Grid.Row="3" Background="Black" />
+            <Border Grid.Column="1" Grid.Row="3" Background="Black" />
+            <Border Grid.Column="3" Grid.Row="3" Background="Black" />
+            <Border Grid.Column="5" Grid.Row="3" Background="Black" />
+            <Border Grid.Column="7" Grid.Row="3" Background="Black" />
 
-            <Border Grid.Column="1" Grid.Row="4" Background="Black" />
-            <Border Grid.Column="3" Grid.Row="4" Background="Black" />
-            <Border Grid.Column="5" Grid.Row="4" Background="Black" />
-            <Border Grid.Column="7" Grid.Row="4" Background="Black" />
+            <Border Grid.Column="2" Grid.Row="4" Background="Black" />
+            <Border Grid.Column="4" Grid.Row="4" Background="Black" />
+            <Border Grid.Column="6" Grid.Row="4" Background="Black" />
+            <Border Grid.Column="8" Grid.Row="4" Background="Black" />
             
-            <Border Grid.Column="0" Grid.Row="5" Background="Black" />
-            <Border Grid.Column="2" Grid.Row="5" Background="Black" />
-            <Border Grid.Column="4" Grid.Row="5" Background="Black" />
-            <Border Grid.Column="6" Grid.Row="5" Background="Black" />
+            <Border Grid.Column="1" Grid.Row="5" Background="Black" />
+            <Border Grid.Column="3" Grid.Row="5" Background="Black" />
+            <Border Grid.Column="5" Grid.Row="5" Background="Black" />
+            <Border Grid.Column="7" Grid.Row="5" Background="Black" />
             
-            <Border Grid.Column="1" Grid.Row="6" Background="Black" />
-            <Border Grid.Column="3" Grid.Row="6" Background="Black" />
-            <Border Grid.Column="5" Grid.Row="6" Background="Black" />
-            <Border Grid.Column="7" Grid.Row="6" Background="Black" />
+            <Border Grid.Column="2" Grid.Row="6" Background="Black" />
+            <Border Grid.Column="4" Grid.Row="6" Background="Black" />
+            <Border Grid.Column="6" Grid.Row="6" Background="Black" />
+            <Border Grid.Column="8" Grid.Row="6" Background="Black" />
             
-            <Border Grid.Column="0" Grid.Row="7" Background="Black" />
-            <Border Grid.Column="2" Grid.Row="7" Background="Black" />
-            <Border Grid.Column="4" Grid.Row="7" Background="Black" />
-            <Border Grid.Column="6" Grid.Row="7" Background="Black" />
+            <Border Grid.Column="1" Grid.Row="7" Background="Black" />
+            <Border Grid.Column="3" Grid.Row="7" Background="Black" />
+            <Border Grid.Column="5" Grid.Row="7" Background="Black" />
+            <Border Grid.Column="7" Grid.Row="7" Background="Black" />
+            
+            <Label Grid.Row="0" Grid.Column="2">
+                <Ellipse
+                        Stretch="UniformToFill"
+                        Margin="1"
+                        Fill="Goldenrod"
+                    />
+            </Label>
+            
+            <Label Grid.Row="0" Grid.Column="4">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="0" Grid.Column="6">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="0" Grid.Column="8">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="1" Grid.Column="1">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="1" Grid.Column="3">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="1" Grid.Column="5">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="1" Grid.Column="7">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="2" Grid.Column="2">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="2" Grid.Column="4">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="2" Grid.Column="6">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="2" Grid.Column="8">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Goldenrod"
+                />
+            </Label>
+            
+            <Label Grid.Row="5" Grid.Column="1">
+                <Ellipse
+                        Stretch="UniformToFill"
+                        Margin="1"
+                        Fill="Silver"
+                    />
+            </Label>
+            
+            <Label Grid.Row="5" Grid.Column="3">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="5" Grid.Column="5">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="5" Grid.Column="7">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="6" Grid.Column="2">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="6" Grid.Column="4">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="6" Grid.Column="6">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="6" Grid.Column="8">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="7" Grid.Column="1">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="7" Grid.Column="3">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="7" Grid.Column="5">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Label Grid.Row="7" Grid.Column="7">
+                <Ellipse
+                    Stretch="UniformToFill"
+                    Margin="1"
+                    Fill="Silver"
+                />
+            </Label>
+            
+            <Border Grid.Row="0" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            <Border Grid.Row="1" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            <Border Grid.Row="2" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            <Border Grid.Row="3" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            <Border Grid.Row="4" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            <Border Grid.Row="5" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            <Border Grid.Row="6" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            <Border Grid.Row="7" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            <Border Grid.Row="8" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 0 3 0" />
+            
+            <Border Grid.Row="8" Grid.Column="0" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+            <Border Grid.Row="8" Grid.Column="1" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+            <Border Grid.Row="8" Grid.Column="2" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+            <Border Grid.Row="8" Grid.Column="3" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+            <Border Grid.Row="8" Grid.Column="4" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+            <Border Grid.Row="8" Grid.Column="5" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+            <Border Grid.Row="8" Grid.Column="6" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+            <Border Grid.Row="8" Grid.Column="7" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+            <Border Grid.Row="8" Grid.Column="8" BorderBrush="{StaticResource brush}" BorderThickness="0 3 0 0" />
+
+            <TextBlock Grid.Column="0" Grid.Row="0" TextAlignment="Center" FontSize="25" Text="8"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" TextAlignment="Center" FontSize="25" Text="7"/>
+            <TextBlock Grid.Column="0" Grid.Row="2" TextAlignment="Center" FontSize="25" Text="6"/>
+            <TextBlock Grid.Column="0" Grid.Row="3" TextAlignment="Center" FontSize="25" Text="5"/>
+            <TextBlock Grid.Column="0" Grid.Row="4" TextAlignment="Center" FontSize="25" Text="4"/>
+            <TextBlock Grid.Column="0" Grid.Row="5" TextAlignment="Center" FontSize="25" Text="3"/>
+            <TextBlock Grid.Column="0" Grid.Row="6" TextAlignment="Center" FontSize="25" Text="2"/>
+            <TextBlock Grid.Column="0" Grid.Row="7" TextAlignment="Center" FontSize="25" Text="1"/>
+            
+            <TextBlock Grid.Column="1" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="a"/>
+            <TextBlock Grid.Column="2" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="b"/>
+            <TextBlock Grid.Column="3" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="c"/>
+            <TextBlock Grid.Column="4" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="d"/>
+            <TextBlock Grid.Column="5" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="e"/>
+            <TextBlock Grid.Column="6" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="f"/>
+            <TextBlock Grid.Column="7" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="g"/>
+            <TextBlock Grid.Column="8" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="h"/>
+
         </Grid>
     </Border>
     </Grid>
