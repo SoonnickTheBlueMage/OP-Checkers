@@ -22,6 +22,8 @@ namespace Checkers
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly Board GameBoard = new(); 
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -30,12 +32,12 @@ namespace Checkers
             AddCheckers();
         }
 
-        private Tuple<int, int> ParseButtonName(string name)
+        private static Tuple<char, int> ParseButtonName(string name)
         {
-            var column = name.First() - 'a' + 1;
-            var row = Convert.ToInt32(name.Last());
-
-            return new Tuple<int, int>(column, row);
+            var column = name.First();
+            var row = name.Last() - '0';
+            
+            return new Tuple<char, int>(column, row);
         }
 
         private void ButtonClick(object sender, RoutedEventArgs e)
@@ -45,11 +47,18 @@ namespace Checkers
                 MessageBox.Show("Нажатие на объект, не являющийся кнопкой");
                 return;
             }
-            
-            MessageBox.Show($"Кнопка {pressedButton.Name} нажата");
 
             var cellColumn = ParseButtonName(pressedButton.Name).Item1;
             var cellRow = ParseButtonName(pressedButton.Name).Item2;
+
+            if (GameBoard.Cell(cellColumn, cellRow) != null)
+            {
+                MessageBox.Show("Тут есть шашка");
+            }
+            else
+            {
+                MessageBox.Show("Тут нет шашки");
+            }
         }
 
         private void CreateTable()
