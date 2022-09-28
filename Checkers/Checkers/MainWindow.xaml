@@ -5,7 +5,7 @@
     Title="Checkers" WindowStyle="ThreeDBorderWindow" MinWidth="800" MinHeight="680"  Width="800" Height="680" WindowStartupLocation="CenterScreen" >
 
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center" >
-        <Border  HorizontalAlignment="Left" VerticalAlignment="Top"  BorderBrush="Black" BorderThickness="2">
+        <Border HorizontalAlignment="Left" VerticalAlignment="Top"  BorderBrush="Black" BorderThickness="2">
             <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50" />
