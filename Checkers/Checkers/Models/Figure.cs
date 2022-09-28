@@ -17,7 +17,7 @@ public class Figure
 {
     private readonly Color _color;
     private Status _status;
-    
+
     public Figure(Color color)
     {
         _color = color;

@@ -4,14 +4,14 @@ namespace Checkers.Models;
 
 public class Board
 {
-    private List<List<Figure?>> _board = new();
+    private readonly List<List<Figure?>> _board = new();
 
     public Board() // заполняю доску при создании
     {
         for (var rowIterator = 0; rowIterator < 8; rowIterator++)
         {
             _board.Add(new List<Figure?>());
-            
+
             for (var columnIterator = 0; columnIterator < 8; columnIterator++)
             {
                 Figure? currentFigure = null;
@@ -20,12 +20,12 @@ public class Board
                 {
                     currentFigure = rowIterator switch
                     {
-                        < 3 => new Figure(Color.White),
-                        > 4 => new Figure(Color.Black),
+                        < 3 => new Figure(Color.Black),
+                        > 4 => new Figure(Color.White),
                         _ => null
                     };
                 }
-                
+
                 _board[rowIterator].Add(currentFigure);
             }
         }
@@ -43,7 +43,7 @@ public class Board
     {
         var prepColumnFrom = columnFrom - 'a';
         var prepRowFrom = rowFrom - 1;
-        
+
         var prepColumnTo = columnTo - 'a';
         var prepRowTo = rowTo - 1;
 
@@ -68,17 +68,17 @@ public class Board
 
         if (Cell(columnTo, rowTo) != null)
         {
-            // клутка, в которую ходим, не пустая
+            // клетка, в которую ходим, не пустая
             return false;
         }
-        
-        var movingFigure =  Cell(columnFrom, rowFrom); // помнить что класс - ссылочный тип
+
+        var movingFigure = Cell(columnFrom, rowFrom); // помнить что класс - ссылочный тип
         _board[prepColumnFrom][prepRowFrom] = null;
         _board[prepColumnTo][prepRowTo] = movingFigure;
-        
+
         /* На потом
-        if (prepRowTo == 7 && movingFigure!.GetColor() == Color.White ||
-            prepRowTo == 0 && movingFigure!.GetColor() == Color.Black)
+        if (prepRowTo == 0 && movingFigure!.GetColor() == Color.White ||
+            prepRowTo == 7 && movingFigure!.GetColor() == Color.Black)
             movingFigure.SetStatus(Status.Queen);
         */
 
