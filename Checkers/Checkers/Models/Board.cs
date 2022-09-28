@@ -45,7 +45,7 @@ public class Board
         var prepColumn = column - 'a';
         var prepRow = row - 1;
 
-        return _board[prepColumn][prepRow];
+        return _board[prepRow][prepColumn];
     }
 
     public bool Move(char columnFrom, int rowFrom, char columnTo, int rowTo) // перемещение фигурки, true - все ок
@@ -82,8 +82,8 @@ public class Board
         }
 
         var movingFigure = Cell(columnFrom, rowFrom); // помнить что класс - ссылочный тип
-        _board[prepColumnFrom][prepRowFrom] = null;
-        _board[prepColumnTo][prepRowTo] = movingFigure;
+        _board[prepRowFrom][prepColumnFrom] = null;
+        _board[prepRowTo][prepColumnTo] = movingFigure;
 
         /* На потом
         if (prepRowTo == 0 && movingFigure!.GetColor() == Color.White ||
