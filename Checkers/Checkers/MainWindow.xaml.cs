@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,53 @@ namespace Checkers
         public MainWindow()
         {
             InitializeComponent();
+            
+            CreateTable();
+        }
+        
+        private void ButtonClick(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show($"Кнопка {(sender as Button)?.Name} нажата");
+        }
+
+        private void CreateTable()
+        {
+            for (var rowIterator = 0; rowIterator < 8; rowIterator++)
+            {
+                for (var columnIterator = 1; columnIterator < 9; columnIterator++)
+                {
+                    if (rowIterator % 2 == columnIterator % 2)
+                    {
+                        var whiteBorder = new Border
+                        {
+                            Background = Brushes.White
+                        };
+                        
+                        Grid.SetColumn(whiteBorder, columnIterator);
+                        Grid.SetRow(whiteBorder, rowIterator);
+
+                        GridBoard.Children.Add(whiteBorder);
+                    }
+                    else
+                    {
+                        var c = (char) ('a' + columnIterator - 1);
+                        var r =  8 - rowIterator;
+                        
+                        var blackButton = new Button()
+                        {
+                            Name = $"{c}" + $"{r}",
+                            Background = Brushes.Black,
+                        };
+
+                        blackButton.Click += ButtonClick;
+                        
+                        Grid.SetColumn(blackButton, columnIterator);
+                        Grid.SetRow(blackButton, rowIterator);
+
+                        GridBoard.Children.Add(blackButton);
+                    }
+                }
+            }
         }
     }
 }
