@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Checkers.Models;
 
 namespace Checkers
 {
@@ -29,9 +30,26 @@ namespace Checkers
             AddCheckers();
         }
 
+        private Tuple<int, int> ParseButtonName(string name)
+        {
+            var column = name.First() - 'a' + 1;
+            var row = Convert.ToInt32(name.Last());
+
+            return new Tuple<int, int>(column, row);
+        }
+
         private void ButtonClick(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show($"Кнопка {(sender as Button)?.Name} нажата");
+            if (sender is not Button pressedButton)
+            {
+                MessageBox.Show("Нажатие на объект, не являющийся кнопкой");
+                return;
+            }
+            
+            MessageBox.Show($"Кнопка {pressedButton.Name} нажата");
+
+            var cellColumn = ParseButtonName(pressedButton.Name).Item1;
+            var cellRow = ParseButtonName(pressedButton.Name).Item2;
         }
 
         private void CreateTable()
