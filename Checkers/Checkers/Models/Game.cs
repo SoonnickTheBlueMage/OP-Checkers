@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic; // SOLID?
+using System.Collections.Generic;
+using System.Windows; // SOLID?
 
 namespace Checkers.Models;
 
@@ -29,6 +30,8 @@ public class Game
     private void NextTurn()
     {
         _turnColor = _turnColor == Color.White ? Color.Black : Color.White;
+        _turnStatus = TurnStatus.WaitingFigurePick;
+        _picked = null;
     } // смена ходящего игрока
 
     public Game()
@@ -73,11 +76,15 @@ public class Game
             _turnStatus = TurnStatus.WaitingMoveToCellPick;
             
             var possibleBasicMoves = _gameBoard.FigureCanBasicMove(_picked.Item1, _picked.Item2);
+            var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
+
             var command = "mark_cells: ";
-            foreach (var line in possibleBasicMoves)
-                command += line.Item1.ToString() + line.Item2.ToString() + " ";
+            foreach (var line in possibleAttacks.Count > 0 ? possibleAttacks : possibleBasicMoves)
+                    command += line.Item1.ToString() + line.Item2.ToString() + " ";
             command = command[..^1];
 
+            MessageBox.Show(possibleBasicMoves.Count.ToString());
+            
             return new List<string> {"unmark_cells", $"select_figure: {cellColumn}{cellRow}", command};
         }
         else
@@ -87,24 +94,38 @@ public class Game
                 _picked = null;
                 _turnStatus = TurnStatus.WaitingFigurePick;
                 
-                return new List<string>() {"unselect", DrawPossiblePickCommand()};
+                return new List<string>() {"unselect", "unmark_cells", DrawPossiblePickCommand()};
             }
 
             if (_picked == null)
                 return new List<string>();
 
             var possibleBasicMoves = _gameBoard.FigureCanBasicMove(_picked.Item1, _picked.Item2);
-            
-            if (! possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
-                return new List<string> {$"Message: чел ты {possibleBasicMoves.Count}"};
+            var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
             
             _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
-
-            var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
-            _picked = new Tuple<char, int>(cellColumn, cellRow);
             
-            //if stil must attack must attack dont end turn
-            return new List<string> {"unmark_cells", command};
+            if (possibleAttacks.Count > 0)
+            {
+                if (! possibleAttacks.Contains(new Tuple<char, int>(cellColumn, cellRow)))
+                    return new List<string>();
+                
+                // delete checkers we came through
+                var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
+                _picked = new Tuple<char, int>(cellColumn, cellRow);
+
+                return new List<string> {"unmark_cells", command};
+            }
+            else
+            {
+                if (! possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
+                    return new List<string>();
+                
+                var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
+                NextTurn();
+
+                return new List<string> {"unmark_cells", command, "unselect", DrawPossiblePickCommand()};
+            }
         }
     }
 }

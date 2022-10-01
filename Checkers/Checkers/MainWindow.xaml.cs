@@ -117,8 +117,6 @@ namespace Checkers
                             IsHitTestVisible = false,
                             Name = $"{(char)(columnIterator - 1 + 'a')}{8 - rowIterator}"
                         };
-                        
-                        MessageBox.Show($"{checker.Name}");
 
                         Grid.SetColumn(checker, columnIterator);
                         Grid.SetRow(checker, rowIterator);

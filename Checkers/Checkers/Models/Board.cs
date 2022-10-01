@@ -172,7 +172,6 @@ public class Board
     public List<Tuple<char, int>> FigureCanBasicMove(char visualColumn, int visualRow)
     {
         var basicMoves = new List<Tuple<char, int>>();
-        var mustAttack = new List<Tuple<char, int>>();
 
         var figure = Cell(visualColumn, visualRow);
 
@@ -204,7 +203,7 @@ public class Board
             if ( figure.GetColor() == Color.Black && 
                  VisualRow2BoardRow(visualRow) - 1 >= 0 &&
                  VisualColumn2BoardColumn(visualColumn) + 1 < 8 &&
-                 _board[VisualRow2BoardRow(visualRow) + 1][VisualColumn2BoardColumn(visualColumn) + 1] == null)
+                 _board[VisualRow2BoardRow(visualRow) - 1][VisualColumn2BoardColumn(visualColumn) + 1] == null)
             {
                 basicMoves.Add(new Tuple<char, int>
                 (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 1), 
@@ -214,7 +213,7 @@ public class Board
             if ( figure.GetColor() == Color.Black && 
                  VisualRow2BoardRow(visualRow) - 1 >= 0 &&
                  VisualColumn2BoardColumn(visualColumn) - 1 >= 0 &&
-                 _board[VisualRow2BoardRow(visualRow) + 1][VisualColumn2BoardColumn(visualColumn) - 1] == null)
+                 _board[VisualRow2BoardRow(visualRow) - 1][VisualColumn2BoardColumn(visualColumn) - 1] == null)
             {
                 basicMoves.Add(new Tuple<char, int>
                 (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 1), 
@@ -226,7 +225,78 @@ public class Board
             // todo if it's queen
         }
         
-        return mustAttack.Count != 0 ? mustAttack : basicMoves;
+        return basicMoves;
+    }
+
+    public List<Tuple<char, int>> FigureCanAttack(char visualColumn, int visualRow, Color playingColor)
+    {
+        var mustAttack = new List<Tuple<char, int>>();
+
+        var figure = Cell(visualColumn, visualRow);
+        
+        if (figure == null)
+            return new List<Tuple<char, int>>();
+
+        if (figure.GetStatus() == Status.Checker)
+        {
+            if ( VisualRow2BoardRow(visualRow) + 2 < 8 &&
+                 VisualColumn2BoardColumn(visualColumn) + 2 < 8 &&
+                 Cell(BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 1), 
+                      BoardRow2VisualRow(VisualRow2BoardRow(visualRow) + 1)) != null &&
+                 Cell(BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 1),
+                     BoardRow2VisualRow(VisualRow2BoardRow(visualRow) + 1))!.GetColor() != playingColor &&
+                 _board[VisualRow2BoardRow(visualRow) + 2][VisualColumn2BoardColumn(visualColumn) + 2] == null)
+            {
+                mustAttack.Add(new Tuple<char, int>
+                (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 2), 
+                    BoardRow2VisualRow(VisualRow2BoardRow(visualRow) + 2)));
+            }
+
+            if ( VisualRow2BoardRow(visualRow) + 2 < 8 &&
+                 VisualColumn2BoardColumn(visualColumn) - 2 >= 0 &&
+                 Cell(BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 1), 
+                     BoardRow2VisualRow(VisualRow2BoardRow(visualRow) + 1)) != null &&
+                 Cell(BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 1),
+                     BoardRow2VisualRow(VisualRow2BoardRow(visualRow) + 1))!.GetColor() != playingColor &&
+                 _board[VisualRow2BoardRow(visualRow) + 2][VisualColumn2BoardColumn(visualColumn) - 2] == null)
+            {
+                mustAttack.Add(new Tuple<char, int>
+                (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 2), 
+                    BoardRow2VisualRow(VisualRow2BoardRow(visualRow) + 2)));
+            }
+            
+            if ( VisualRow2BoardRow(visualRow) - 2 >= 0 &&
+                 VisualColumn2BoardColumn(visualColumn) + 2 < 8 &&
+                 Cell(BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 1), 
+                     BoardRow2VisualRow(VisualRow2BoardRow(visualRow) - 1)) != null &&
+                 Cell(BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 1),
+                     BoardRow2VisualRow(VisualRow2BoardRow(visualRow) - 1))!.GetColor() != playingColor &&
+                 _board[VisualRow2BoardRow(visualRow) - 2][VisualColumn2BoardColumn(visualColumn) + 2] == null)
+            {
+                mustAttack.Add(new Tuple<char, int>
+                (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 2), 
+                    BoardRow2VisualRow(VisualRow2BoardRow(visualRow) - 2)));
+            }
+
+            if ( VisualRow2BoardRow(visualRow) - 2 >= 0 &&
+                 VisualColumn2BoardColumn(visualColumn) - 2 >= 0 &&
+                 Cell(BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 1), 
+                     BoardRow2VisualRow(VisualRow2BoardRow(visualRow) - 1)) != null &&
+                 Cell(BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 1),
+                     BoardRow2VisualRow(VisualRow2BoardRow(visualRow) - 1))!.GetColor() != playingColor &&
+                 _board[VisualRow2BoardRow(visualRow) - 2][VisualColumn2BoardColumn(visualColumn) - 2] == null)
+            {
+                mustAttack.Add(new Tuple<char, int>
+                (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 2), 
+                    BoardRow2VisualRow(VisualRow2BoardRow(visualRow) - 2)));
+            }
+        }
+        else
+        {
+            //todo if it's queen
+        }
+
+        return mustAttack;
     }
 
     public void MoveFigure(char visColumnFrom, int visRowFrom, char visColumnTo, int visRowTo)
