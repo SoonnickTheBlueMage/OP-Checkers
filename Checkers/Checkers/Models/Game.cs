@@ -41,6 +41,19 @@ public class Game
         _picked = null;
     } // constructor
 
+    public string DrawPossiblePickCommand()
+    {
+        var possiblePick = _gameBoard.AllPossibleToPick(_turnColor);
+        var command = "enlight cell: ";
+        
+        foreach (var line in possiblePick)
+        {
+            command += line.Item1.ToString() + line.Item2.ToString() + " ";
+        }
+
+        return command;
+    }
+
     public List<string> Turn(char cellColumn, int cellRow)
     {
         if (!GameContinues())
@@ -50,22 +63,26 @@ public class Game
         
         if (_turnStatus == TurnStatus.WaitingFigurePick)
         {
+            var possiblePick = _gameBoard.AllPossibleToPick(_turnColor);
+            
             if (_gameBoard.Cell(cellColumn, cellRow) == null)
             {
-                // empty cell picked, do nothing
+                // клетка пустая
                 return new List<string>();
             }
 
-            if (_gameBoard.Cell(cellColumn, cellRow)!.GetColor() != _turnColor)
+            else if (! possiblePick.Contains(new Tuple<char, int>(cellColumn, cellRow)))
             {
-                // wrong color figure picked
+                // нельзя пикнуть
                 return new List<string>();
             }
-            
-            _picked = new Tuple<char, int>(cellColumn, cellRow);
-            _turnStatus = TurnStatus.WaitingMoveToCellPick;
+            else
+            {
+                _picked = new Tuple<char, int>(cellColumn, cellRow);
+                _turnStatus = TurnStatus.WaitingMoveToCellPick;
 
-            return new List<string> {$"set figure: {cellColumn}{cellRow}"};
+                return new List<string> {$"set figure: {cellColumn}{cellRow}  {_gameBoard.Cell(cellColumn, cellRow).GetColor()}"};
+            }
         }
         
         // elsr if _turn status = ...

@@ -30,6 +30,8 @@ namespace Checkers
 
             CreateTable();
             AddCheckers();
+
+            Execute(CurrentGame.DrawPossiblePickCommand());
         }
 
         private static Tuple<char, int> ParseButtonName(string name)
@@ -55,9 +57,8 @@ namespace Checkers
 
             foreach (var line in todo)
             {
-                MessageBox.Show(line);
+                Execute(line);
             }
-            // функция должна вохвращать то что нужно изменить графически, обрабатывать ифом
         }
 
         private void CreateTable()
@@ -123,6 +124,11 @@ namespace Checkers
                     }
                 }
             }
+        }
+
+        private static void Execute(string command)
+        {
+            MessageBox.Show(command);
         }
     }
 }

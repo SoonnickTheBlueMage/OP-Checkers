@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic; // нарушение SOLID?
+﻿using System;
+using System.Collections.Generic; // нарушение SOLID?
 
 namespace Checkers.Models;
 
@@ -11,9 +12,46 @@ namespace Checkers.Models;
  * индекс колонн в этом классе на 1 меньше чем в grid
  */
 
+/*
+ *  Board Coordinates               Visual Coordinates
+ *  horizontal - column
+ *  vertical - row
+ * 
+ *      01234567                          abcdefgh
+ *    7 b_b_b_b_                        8 b_b_b_b_
+ *    6 _b_b_b_b                        7 _b_b_b_b
+ *    5 b_b_b_b_                        6 b_b_b_b_
+ *    4 ________                        5 ________
+ *    3 ________                        4 ________
+ *    2 _w_w_w_w                        3 _w_w_w_w
+ *    1 w_w_w_w_                        2 w_w_w_w_
+ *    0 _w_w_w_w                        1 _w_w_w_w
+ */
+
 public class Board
 {
     private readonly List<List<Figure?>> _board = new();
+
+    private static int VisualRow2BoardRow(int visualRow)
+    {
+        return visualRow - 1;
+    }
+
+    private static int VisualColumn2BoardColumn(char visualColumn)
+    {
+        return visualColumn - 'a';
+    }
+    
+    private static int BoardRow2VisualRow(int boardRow)
+    {
+        return boardRow + 1;
+    }
+
+    private static char BoardColumn2VisualColumn(int boardColumn)
+    {
+        return (char) (boardColumn + 'a');
+    }
+    
     
     public Board() // заполняю доску при создании
     {
@@ -40,71 +78,95 @@ public class Board
         }
     }
     
-    public Figure? Cell(char column, int row) // доступ к клетке по координатам 
+    public Figure? Cell(char column, int row) // доступ к клетке по visual координатам 
     {
-        var prepColumn = column - 'a';
-        var prepRow = row - 1;
+        var prepColumn = VisualColumn2BoardColumn(column);
+        var prepRow = VisualRow2BoardRow(row);
 
         return _board[prepRow][prepColumn];
     }
-
-    public bool DeleteFigure(char column, int row)
-    {
-        var prepColumn = column - 'a';
-        var prepRow = row - 1;
-
-        if (Cell(column, row) == null)
-        {
-            return false;
-        }
-
-        _board[prepRow][prepColumn] = null;
-        return true;
-    }
     
-    public bool MoveFigure(char columnFrom, int rowFrom, char columnTo, int rowTo) // перемещение фигурки, true - все ок
+    public List<Tuple<char, int>> AllPossibleToPick(Color playingColor)
     {
-        var prepColumnFrom = columnFrom - 'a';
-        var prepRowFrom = rowFrom - 1;
-
-        var prepColumnTo = columnTo - 'a';
-        var prepRowTo = rowTo - 1;
-
-        if (prepColumnFrom % 2 == prepRowFrom % 2 || prepColumnTo % 2 == prepRowTo % 2)
+        var basicMoves = new List<Tuple<char, int>>();
+        var mustAtack = new List<Tuple<char, int>>();
+        
+        for (var rowIterator = 0; rowIterator < 8; rowIterator++)
         {
-            // клетка не черная
-            return false;
+            for (var columnIterator = 0; columnIterator < 8; columnIterator++)
+            {
+                var cell = _board[rowIterator][columnIterator];
+                if (cell == null)
+                    continue;
+
+                if (cell.GetColor() == playingColor)
+                {
+                    if (cell.GetStatus() == Status.Checker)
+                    {
+                        //check basic moves
+                        if (playingColor == Color.White && rowIterator + 1 < 8 && 
+                            (columnIterator + 1 < 8 && _board[rowIterator + 1][columnIterator + 1] == null ||
+                             columnIterator - 1 >= 0 && _board[rowIterator + 1][columnIterator - 1] == null))
+                        {
+                            basicMoves.Add(new Tuple<char, int>(BoardColumn2VisualColumn(columnIterator), 
+                                                                    BoardRow2VisualRow(rowIterator)));
+                        }
+                        
+                        if (playingColor == Color.Black && rowIterator - 1 >= 0 && 
+                            (columnIterator + 1 < 8 && _board[rowIterator - 1][columnIterator + 1] == null ||
+                             columnIterator - 1 >= 0 && _board[rowIterator - 1][columnIterator - 1] == null))
+                        {
+                            basicMoves.Add(new Tuple<char, int>(BoardColumn2VisualColumn(columnIterator), 
+                                BoardRow2VisualRow(rowIterator)));
+                        }
+                        
+                        /*
+                        //check must atack
+                        if (_board[rowIterator + 1][columnIterator - 1] != null &&
+                            _board[rowIterator + 1][columnIterator - 1]!.GetColor() != playingColor &&
+                            rowIterator + 2 < 7 && columnIterator - 2 >= 0 &&
+                            _board[rowIterator + 2][columnIterator - 2] == null)
+                        {
+                            mustAtack.Add(new Tuple<char, int>(BoardColumn2VisualColumn(columnIterator), 
+                                                                   BoardRow2VisualRow(rowIterator)));
+                        }
+                        
+                        if (_board[rowIterator + 1][columnIterator + 1] != null &&
+                            _board[rowIterator + 1][columnIterator + 1]!.GetColor() != playingColor &&
+                            rowIterator + 2 < 7 && columnIterator + 2 < 7 &&
+                            _board[rowIterator + 2][columnIterator + 2] == null)
+                        {
+                            mustAtack.Add(new Tuple<char, int>(BoardColumn2VisualColumn(columnIterator), 
+                                BoardRow2VisualRow(rowIterator)));
+                        }
+                        
+                        if (_board[rowIterator - 1][columnIterator - 1] != null &&
+                            _board[rowIterator - 1][columnIterator - 1]!.GetColor() != playingColor &&
+                            rowIterator - 2 >= 0 && columnIterator - 2 >= 0 &&
+                            _board[rowIterator - 2][columnIterator - 2] == null)
+                        {
+                            mustAtack.Add(new Tuple<char, int>(BoardColumn2VisualColumn(columnIterator), 
+                                BoardRow2VisualRow(rowIterator)));
+                        }
+                        
+                        if (_board[rowIterator + 1][columnIterator - 1] != null &&
+                            _board[rowIterator + 1][columnIterator - 1]!.GetColor() != playingColor &&
+                            rowIterator + 2 < 7 && columnIterator - 2 >= 0 &&
+                            _board[rowIterator + 2][columnIterator - 2] == null)
+                        {
+                            mustAtack.Add(new Tuple<char, int>(BoardColumn2VisualColumn(columnIterator), 
+                                BoardRow2VisualRow(rowIterator)));
+                        }
+                        */
+                    }
+                    else
+                    {
+                        // todo if its Quenn
+                    }
+                }
+            }
         }
 
-        if (prepColumnFrom is < 0 or > 7 || prepRowFrom is < 0 or > 7 ||
-            prepColumnTo is < 0 or > 7 || prepRowTo is < 0 or > 7)
-        {
-            // неправильные координаты
-            return false;
-        }
-
-        if (Cell(columnFrom, rowFrom) == null)
-        {
-            // клетка, из которой ходим, пустая
-            return false;
-        }
-
-        if (Cell(columnTo, rowTo) != null)
-        {
-            // клетка, в которую ходим, не пустая
-            return false;
-        }
-
-        var movingFigure = Cell(columnFrom, rowFrom); // помнить что класс - ссылочный тип
-        _board[prepRowFrom][prepColumnFrom] = null;
-        _board[prepRowTo][prepColumnTo] = movingFigure;
-
-        /* На потом
-        if (prepRowTo == 0 && movingFigure!.GetColor() == Color.White ||
-            prepRowTo == 7 && movingFigure!.GetColor() == Color.Black)
-            movingFigure.SetStatus(Status.Queen);
-        */
-
-        return true;
+        return mustAtack.Count != 0 ? mustAtack : basicMoves;
     }
 }
