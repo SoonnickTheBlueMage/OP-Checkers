@@ -16,8 +16,8 @@ public class Game
     private int _whiteFigures;
     private int _blackFigures;
     private TurnStatus _turnStatus;
-    private Tuple<char, int>? _picked;
-    
+    private Tuple<char, int>? _picked = null;
+
     //private List<string> turnLogger;
 
 
@@ -44,14 +44,14 @@ public class Game
     public string DrawPossiblePickCommand()
     {
         var possiblePick = _gameBoard.AllPossibleToPick(_turnColor);
-        var command = "enlight cell: ";
-        
+        var command = "mark_cells: ";
+
         foreach (var line in possiblePick)
         {
             command += line.Item1.ToString() + line.Item2.ToString() + " ";
         }
 
-        return command;
+        return command[..^1];
     }
 
     public List<string> Turn(char cellColumn, int cellRow)
@@ -60,33 +60,31 @@ public class Game
         {
             return new List<string> {"message: Game over"};
         }
-        
+
         if (_turnStatus == TurnStatus.WaitingFigurePick)
         {
             var possiblePick = _gameBoard.AllPossibleToPick(_turnColor);
-            
-            if (_gameBoard.Cell(cellColumn, cellRow) == null)
-            {
-                // клетка пустая
-                return new List<string>();
-            }
 
-            else if (! possiblePick.Contains(new Tuple<char, int>(cellColumn, cellRow)))
-            {
-                // нельзя пикнуть
+            if (!possiblePick.Contains(new Tuple<char, int>(cellColumn, cellRow)))
                 return new List<string>();
-            }
-            else
-            {
-                _picked = new Tuple<char, int>(cellColumn, cellRow);
-                _turnStatus = TurnStatus.WaitingMoveToCellPick;
 
-                return new List<string> {$"set figure: {cellColumn}{cellRow}  {_gameBoard.Cell(cellColumn, cellRow).GetColor()}"};
+
+            _picked = new Tuple<char, int>(cellColumn, cellRow);
+            _turnStatus = TurnStatus.WaitingMoveToCellPick;
+
+            return new List<string> {"unmark_cells", $"select_figure: {cellColumn}{cellRow}"};
+        }
+        else
+        {
+            if (new Tuple<char, int>(cellColumn, cellRow).Equals(_picked))
+            {
+                _picked = null;
+                _turnStatus = TurnStatus.WaitingFigurePick;
+                
+                return new List<string>() {"unselect", DrawPossiblePickCommand()};
             }
         }
-        
-        // elsr if _turn status = ...
-        
+
         return new List<string>();
     }
 }

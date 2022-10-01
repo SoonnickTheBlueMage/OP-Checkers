@@ -40,9 +40,9 @@ namespace Checkers
             var row = name.Last() - '0';
 
             return new Tuple<char, int>(column, row);
-        }
+        } // to visual coords
 
-        private static void ButtonClick(object sender, RoutedEventArgs e)
+        private void ButtonClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button pressedButton)
             {
@@ -126,9 +126,79 @@ namespace Checkers
             }
         }
 
-        private static void Execute(string command)
+        private void Execute(string command)
         {
             MessageBox.Show(command);
+            if (command.Contains("message:"))
+            {
+                MessageBox.Show(command.Remove(0, 9));
+            }
+
+            if (command.Contains("select_figure:"))
+            {
+                var name = command.Split(" ").Last();
+
+                var selectedFigure = new Ellipse()
+                {
+                    Stroke = Brushes.Blue,
+                    StrokeThickness = 3,
+                    Width = 40,
+                    Height = 40,
+                    IsHitTestVisible = false,
+                    Tag = "selector"
+                };
+
+                Grid.SetColumn(selectedFigure, name.First() - 'a' + 1);
+                Grid.SetRow(selectedFigure, '8' - name.Last());
+
+                GridBoard.Children.Add(selectedFigure);
+                
+            }
+
+            if (command.Contains("unselect"))
+            {
+                for (int i = GridBoard.Children.Count - 1; i >= 0; --i)
+                {
+                    if (GridBoard.Children[i] is Ellipse cellMarker && (string) cellMarker.Tag == "selector")
+                    {
+                        GridBoard.Children.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (command.Contains("mark_cells:"))
+            {
+                var line = command.Remove(0, 12).Split(" ");
+
+                foreach (var name in line)
+                {
+                    var selectedFigure = new Rectangle()
+                    {
+                        Stroke = Brushes.Aqua,
+                        StrokeThickness = 2,
+                        Width = 50,
+                        Height = 50,
+                        IsHitTestVisible = false,
+                        Tag = "marker"
+                    };
+
+                    Grid.SetColumn(selectedFigure, name.First() - 'a' + 1);
+                    Grid.SetRow(selectedFigure, '8' - name.Last());
+
+                    GridBoard.Children.Add(selectedFigure);
+                }
+            }
+
+            if (command.Contains("unmark_cells"))
+            {
+                for (int i = GridBoard.Children.Count - 1; i >= 0; --i)
+                {
+                    if (GridBoard.Children[i] is Rectangle cellMarker && (string) cellMarker.Tag == "marker")
+                    {
+                        GridBoard.Children.RemoveAt(i);
+                    }
+                }
+            }
         }
     }
 }
