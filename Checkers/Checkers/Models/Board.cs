@@ -14,7 +14,7 @@ namespace Checkers.Models;
 public class Board
 {
     private readonly List<List<Figure?>> _board = new();
-
+    
     public Board() // заполняю доску при создании
     {
         for (var rowIterator = 0; rowIterator < 8; rowIterator++)
@@ -29,8 +29,8 @@ public class Board
                 {
                     currentFigure = rowIterator switch
                     {
-                        < 3 => new Figure(Color.Black),
-                        > 4 => new Figure(Color.White),
+                        < 3 => new Figure(Color.White),
+                        > 4 => new Figure(Color.Black),
                         _ => null
                     };
                 }
@@ -39,7 +39,7 @@ public class Board
             }
         }
     }
-
+    
     public Figure? Cell(char column, int row) // доступ к клетке по координатам 
     {
         var prepColumn = column - 'a';
@@ -48,7 +48,21 @@ public class Board
         return _board[prepRow][prepColumn];
     }
 
-    public bool Move(char columnFrom, int rowFrom, char columnTo, int rowTo) // перемещение фигурки, true - все ок
+    public bool DeleteFigure(char column, int row)
+    {
+        var prepColumn = column - 'a';
+        var prepRow = row - 1;
+
+        if (Cell(column, row) == null)
+        {
+            return false;
+        }
+
+        _board[prepRow][prepColumn] = null;
+        return true;
+    }
+    
+    public bool MoveFigure(char columnFrom, int rowFrom, char columnTo, int rowTo) // перемещение фигурки, true - все ок
     {
         var prepColumnFrom = columnFrom - 'a';
         var prepRowFrom = rowFrom - 1;

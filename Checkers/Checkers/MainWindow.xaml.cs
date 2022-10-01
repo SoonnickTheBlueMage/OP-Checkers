@@ -22,8 +22,8 @@ namespace Checkers
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly Board GameBoard = new(); 
-        
+        private static readonly Game CurrentGame = new();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,11 +36,11 @@ namespace Checkers
         {
             var column = name.First();
             var row = name.Last() - '0';
-            
+
             return new Tuple<char, int>(column, row);
         }
 
-        private void ButtonClick(object sender, RoutedEventArgs e)
+        private static void ButtonClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button pressedButton)
             {
@@ -51,14 +51,13 @@ namespace Checkers
             var cellColumn = ParseButtonName(pressedButton.Name).Item1;
             var cellRow = ParseButtonName(pressedButton.Name).Item2;
 
-            if (GameBoard.Cell(cellColumn, cellRow) != null)
+            var todo = CurrentGame.Turn(cellColumn, cellRow);
+
+            foreach (var line in todo)
             {
-                MessageBox.Show("Тут есть шашка");
+                MessageBox.Show(line);
             }
-            else
-            {
-                MessageBox.Show("Тут нет шашки");
-            }
+            // функция должна вохвращать то что нужно изменить графически, обрабатывать ифом
         }
 
         private void CreateTable()

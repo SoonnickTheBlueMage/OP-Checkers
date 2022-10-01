@@ -9,8 +9,7 @@ public enum Color
 public enum Status
 {
     Checker,
-    Queen,
-    Out
+    Queen
 }
 
 public class Figure
@@ -26,16 +25,16 @@ public class Figure
 
     public Color GetColor()
     {
-        return this._color;
+        return _color;
     }
 
     public Status GetStatus()
     {
-        return this._status;
+        return _status;
     }
 
     public void SetStatus(Status status)
     {
-        this._status = status;
+        _status = status;
     }
 }
