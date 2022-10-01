@@ -67,7 +67,7 @@ namespace Checkers
             {
                 for (var columnIterator = 1; columnIterator < 9; columnIterator++)
                 {
-                    if (rowIterator % 2 == columnIterator % 2)
+                    if (rowIterator % 2 == (columnIterator - 1) % 2)
                     {
                         var whiteBorder = new Border
                         {
@@ -107,15 +107,18 @@ namespace Checkers
             {
                 for (var columnIterator = 1; columnIterator < 9; columnIterator++)
                 {
-                    if ((rowIterator % 2 != columnIterator % 2) && rowIterator is < 3 or > 4)
+                    if ((rowIterator % 2 != (columnIterator - 1) % 2) && rowIterator is < 3 or > 4)
                     {
                         var checker = new Ellipse()
                         {
                             Fill = (rowIterator < 3) ? Brushes.Goldenrod : Brushes.Silver,
                             Width = 40,
                             Height = 40,
-                            IsHitTestVisible = false
+                            IsHitTestVisible = false,
+                            Name = $"{(char)(columnIterator - 1 + 'a')}{8 - rowIterator}"
                         };
+                        
+                        MessageBox.Show($"{checker.Name}");
 
                         Grid.SetColumn(checker, columnIterator);
                         Grid.SetRow(checker, rowIterator);
@@ -162,6 +165,7 @@ namespace Checkers
                     if (GridBoard.Children[i] is Ellipse cellMarker && (string) cellMarker.Tag == "selector")
                     {
                         GridBoard.Children.RemoveAt(i);
+                        break;
                     }
                 }
             }
@@ -198,6 +202,41 @@ namespace Checkers
                         GridBoard.Children.RemoveAt(i);
                     }
                 }
+            }
+
+            if (command.Contains("move:"))
+            {
+                var line = command.Split(" ");
+                var nameFrom = line[1];
+                var nameTo = line[2];
+                var color = line[3];
+
+                for (int i = GridBoard.Children.Count - 1; i >= 0; --i)
+                {
+                    if (GridBoard.Children[i] is Ellipse figure && figure.Name == nameFrom)
+                    {
+                        GridBoard.Children.RemoveAt(i);
+                        break;
+                    }
+                }
+                
+                Execute("unselect");
+
+                var checker = new Ellipse()
+                {
+                    Fill = (color == "Black") ? Brushes.Goldenrod : Brushes.Silver,
+                    Width = 40,
+                    Height = 40,
+                    IsHitTestVisible = false,
+                    Name = $"{nameTo.First()}{nameTo.Last()}"
+                };
+
+                Grid.SetColumn(checker, nameTo.First() - 'a' + 1);
+                Grid.SetRow(checker, '8' - nameTo.Last());
+
+                GridBoard.Children.Add(checker);
+                
+                Execute($"select_figure: {nameTo}");
             }
         }
     }

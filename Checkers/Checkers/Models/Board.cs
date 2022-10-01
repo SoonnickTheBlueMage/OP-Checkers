@@ -17,14 +17,14 @@ namespace Checkers.Models;
  *  vertical - row
  * 
  *      01234567                          abcdefgh
- *    7 b_b_b_b_                        8 b_b_b_b_
- *    6 _b_b_b_b                        7 _b_b_b_b
- *    5 b_b_b_b_                        6 b_b_b_b_
+ *    7 _b_b_b_b                        8 _b_b_b_b
+ *    6 b_b_b_b_                        7 b_b_b_b_
+ *    5 _b_b_b_b                        6 _b_b_b_b
  *    4 ________                        5 ________
  *    3 ________                        4 ________
- *    2 _w_w_w_w                        3 _w_w_w_w
- *    1 w_w_w_w_                        2 w_w_w_w_
- *    0 _w_w_w_w                        1 _w_w_w_w
+ *    2 w_w_w_w_                        3 w_w_w_w_
+ *    1 _w_w_w_w                        2 _w_w_w_w
+ *    0 w_w_w_w_                        1 w_w_w_w_
  */
 
 public class Board
@@ -62,7 +62,7 @@ public class Board
             {
                 Figure? currentFigure = null;
 
-                if (rowIterator % 2 != columnIterator % 2)
+                if (rowIterator % 2 == columnIterator % 2)
                 {
                     currentFigure = rowIterator switch
                     {
@@ -77,12 +77,9 @@ public class Board
         }
     }
 
-    public Figure? Cell(char column, int row) // доступ к клетке по visual координатам 
+    public Figure? Cell(char visualColumn, int visualRow) // доступ к клетке
     {
-        var prepColumn = VisualColumn2BoardColumn(column);
-        var prepRow = VisualRow2BoardRow(row);
-
-        return _board[prepRow][prepColumn];
+        return _board[VisualRow2BoardRow(visualRow)][VisualColumn2BoardColumn(visualColumn)];
     }
 
     public List<Tuple<char, int>> AllPossibleToPick(Color playingColor)
@@ -164,11 +161,81 @@ public class Board
                 }
                 else
                 {
-                    // todo if its Quenn
+                    // todo if it's Queen
                 }
             }
         }
 
         return mustAttack.Count != 0 ? mustAttack : basicMoves;
+    }
+
+    public List<Tuple<char, int>> FigureCanBasicMove(char visualColumn, int visualRow)
+    {
+        var basicMoves = new List<Tuple<char, int>>();
+        var mustAttack = new List<Tuple<char, int>>();
+
+        var figure = Cell(visualColumn, visualRow);
+
+        if (figure == null)
+            return new List<Tuple<char, int>>();
+
+        if (figure.GetStatus() == Status.Checker)
+        {
+            if ( figure.GetColor() == Color.White && 
+                 VisualRow2BoardRow(visualRow) + 1 < 8 &&
+                 VisualColumn2BoardColumn(visualColumn) + 1 < 8 &&
+                 _board[VisualRow2BoardRow(visualRow) + 1][VisualColumn2BoardColumn(visualColumn) + 1] == null)
+            {
+                basicMoves.Add(new Tuple<char, int>
+                (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 1), 
+                    BoardRow2VisualRow(VisualRow2BoardRow(visualRow) + 1)));
+            }
+
+            if ( figure.GetColor() == Color.White && 
+                 VisualRow2BoardRow(visualRow) + 1 < 8 &&
+                 VisualColumn2BoardColumn(visualColumn) - 1 >= 0 &&
+                 _board[VisualRow2BoardRow(visualRow) + 1][VisualColumn2BoardColumn(visualColumn) - 1] == null)
+            {
+                basicMoves.Add(new Tuple<char, int>
+                (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 1), 
+                    BoardRow2VisualRow(VisualRow2BoardRow(visualRow) + 1)));
+            }
+            
+            if ( figure.GetColor() == Color.Black && 
+                 VisualRow2BoardRow(visualRow) - 1 >= 0 &&
+                 VisualColumn2BoardColumn(visualColumn) + 1 < 8 &&
+                 _board[VisualRow2BoardRow(visualRow) + 1][VisualColumn2BoardColumn(visualColumn) + 1] == null)
+            {
+                basicMoves.Add(new Tuple<char, int>
+                (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) + 1), 
+                    BoardRow2VisualRow(VisualRow2BoardRow(visualRow) - 1)));
+            }
+
+            if ( figure.GetColor() == Color.Black && 
+                 VisualRow2BoardRow(visualRow) - 1 >= 0 &&
+                 VisualColumn2BoardColumn(visualColumn) - 1 >= 0 &&
+                 _board[VisualRow2BoardRow(visualRow) + 1][VisualColumn2BoardColumn(visualColumn) - 1] == null)
+            {
+                basicMoves.Add(new Tuple<char, int>
+                (BoardColumn2VisualColumn(VisualColumn2BoardColumn(visualColumn) - 1), 
+                    BoardRow2VisualRow(VisualRow2BoardRow(visualRow) - 1)));
+            }
+        }
+        else
+        {
+            // todo if it's queen
+        }
+        
+        return mustAttack.Count != 0 ? mustAttack : basicMoves;
+    }
+
+    public void MoveFigure(char visColumnFrom, int visRowFrom, char visColumnTo, int visRowTo)
+    {
+        // this function is used only after check that the button pressed is in FigureCanMove list
+        // so I dont write any checks here
+        _board[VisualRow2BoardRow(visRowTo)][VisualColumn2BoardColumn(visColumnTo)] =
+            _board[VisualRow2BoardRow(visRowFrom)][VisualColumn2BoardColumn(visColumnFrom)];
+
+        _board[VisualRow2BoardRow(visRowFrom)][VisualColumn2BoardColumn(visColumnFrom)] = null;
     }
 }
