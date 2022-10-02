@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Collections.Generic; // SOLID?
+using System.Collections.Generic;
+
+// SOLID?
 
 namespace Checkers.Models;
 
@@ -11,15 +13,26 @@ public enum TurnStatus
 
 public class Game
 {
-    private Color _turnColor;
     private readonly Board _gameBoard;
-    private int _whiteFigures;
     private int _blackFigures;
+    private Tuple<char, int>? _picked;
+    private Color _turnColor;
     private TurnStatus _turnStatus;
-    private Tuple<char, int>? _picked = null;
+    private int _whiteFigures;
+
+    public Game()
+    {
+        _turnColor = Color.White;
+        _gameBoard = new Board();
+        _whiteFigures = 12;
+        _blackFigures = 12;
+        _turnStatus = TurnStatus.WaitingFigurePick;
+        _picked = null;
+    } // constructor
 
     //private List<string> turnLogger;
 
+    //нет правила про то что надо бить большинство
 
     private bool GameContinues()
     {
@@ -33,15 +46,19 @@ public class Game
         _picked = null;
     } // смена ходящего игрока
 
-    public Game()
+    private string DrawPossibleAttackCommand(char column, int row)
     {
-        _turnColor = Color.White;
-        _gameBoard = new Board();
-        _whiteFigures = 12;
-        _blackFigures = 12;
-        _turnStatus = TurnStatus.WaitingFigurePick;
-        _picked = null;
-    } // constructor
+        if (_picked == null)
+            return "";
+
+        var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
+        var command = "mark_cells: ";
+
+        foreach (var line in possibleAttacks)
+            command += line.Item1 + line.Item2.ToString() + " ";
+
+        return command[..^1];
+    }
 
     public string DrawPossiblePickCommand()
     {
@@ -49,9 +66,7 @@ public class Game
         var command = "mark_cells: ";
 
         foreach (var line in possiblePick)
-        {
-            command += line.Item1.ToString() + line.Item2.ToString() + " ";
-        }
+            command += line.Item1 + line.Item2.ToString() + " ";
 
         return command[..^1];
     }
@@ -59,9 +74,7 @@ public class Game
     public List<string> Turn(char cellColumn, int cellRow)
     {
         if (!GameContinues())
-        {
-            return new List<string> {"message: Game over"};
-        }
+            return new List<string> {$"message: Game over, {(_whiteFigures == 0 ? "Black win" : "White win")}"};
 
         if (_turnStatus == TurnStatus.WaitingFigurePick)
         {
@@ -70,16 +83,15 @@ public class Game
             if (!possiblePick.Contains(new Tuple<char, int>(cellColumn, cellRow)))
                 return new List<string>();
 
-
             _picked = new Tuple<char, int>(cellColumn, cellRow);
             _turnStatus = TurnStatus.WaitingMoveToCellPick;
-            
+
             var possibleBasicMoves = _gameBoard.FigureCanBasicMove(_picked.Item1, _picked.Item2);
             var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
 
             var command = "mark_cells: ";
             foreach (var line in possibleAttacks.Count > 0 ? possibleAttacks : possibleBasicMoves)
-                    command += line.Item1.ToString() + line.Item2.ToString() + " ";
+                command += line.Item1 + line.Item2.ToString() + " ";
             command = command[..^1];
 
             return new List<string> {"unmark_cells", $"select_figure: {cellColumn}{cellRow}", command};
@@ -90,69 +102,77 @@ public class Game
             {
                 _picked = null;
                 _turnStatus = TurnStatus.WaitingFigurePick;
-                
-                return new List<string>() {"unselect", "unmark_cells", DrawPossiblePickCommand()};
+
+                return new List<string> {"unselect", "unmark_cells", DrawPossiblePickCommand()};
             }
 
             if (_picked == null)
                 return new List<string>();
 
+            var transform = false;
             var possibleBasicMoves = _gameBoard.FigureCanBasicMove(_picked.Item1, _picked.Item2);
             var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
-            
+
             if (possibleAttacks.Count > 0)
             {
-                if (! possibleAttacks.Contains(new Tuple<char, int>(cellColumn, cellRow)))
+                if (!possibleAttacks.Contains(new Tuple<char, int>(cellColumn, cellRow)))
                     return new List<string>();
 
                 var killed = _gameBoard.GetKilledFiguresCell(
                     _picked.Item1, _picked.Item2, cellColumn, cellRow);
 
-                var moveCommand = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
-
-                _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
-
+                var moveCommand = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor} " +
+                                  $"{_gameBoard.Cell(_picked.Item1, _picked.Item2)!.GetStatus()}";
                 var killCommand = $"erase: {killed.Item1}{killed.Item2}";
-                
+
+                transform = _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
                 _gameBoard.DeleteFigure(killed.Item1, killed.Item2);
-                
+
                 _picked = new Tuple<char, int>(cellColumn, cellRow);
 
                 if (_turnColor == Color.White)
-                {
                     _blackFigures--;
-                }
                 else
-                {
                     _whiteFigures--;
-                }
-                
-                var showCommand = "mark_cells: ";
-                foreach (var line in _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor))
-                    showCommand += line.Item1.ToString() + line.Item2.ToString() + " ";
-                showCommand = showCommand[..^1];
+
+                var returnCommandList = new List<string> {"unmark_cells", moveCommand, killCommand};
+
+                if (transform) returnCommandList.Add($"transform: {_picked.Item1}{_picked.Item2} {_turnColor}");
 
                 if (_gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor).Count == 0)
                 {
                     NextTurn();
-                    return new List<string> {"unmark_cells", moveCommand, killCommand, "unselect", DrawPossiblePickCommand()};
+                    returnCommandList.Add("unselect");
+                    returnCommandList.Add(DrawPossiblePickCommand());
+                }
+                else
+                {
+                    returnCommandList.Add(DrawPossibleAttackCommand(_picked.Item1, _picked.Item2));
                 }
 
-                return new List<string> {"unmark_cells", moveCommand, killCommand, showCommand};
+                return returnCommandList;
             }
 
             if (!possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
                 return new List<string>();
 
-            _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
-                
-            if (! possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
+            var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor} " +
+                          $"{_gameBoard.Cell(_picked.Item1, _picked.Item2)!.GetStatus()}";
+
+            transform = _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
+
+            if (!possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
                 return new List<string>();
-                
-            var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
+
+            var returnCommands = new List<string> {"unmark_cells", command, "unselect"};
+
+            if (transform) returnCommands.Add($"transform: {cellColumn}{cellRow} {_turnColor}");
+
             NextTurn();
 
-            return new List<string> {"unmark_cells", command, "unselect", DrawPossiblePickCommand()};
+            returnCommands.Add(DrawPossiblePickCommand());
+
+            return returnCommands;
         }
     }
 }
