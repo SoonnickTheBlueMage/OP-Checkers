@@ -171,8 +171,10 @@ namespace Checkers
 
             if (command.Contains("mark_cells:"))
             {
+                if (command.Length <= 12) return;
+                    
                 var line = command.Remove(0, 12).Split(" ");
-                
+
                 if (line.Length == 0) return;
 
                 foreach (var name in line)

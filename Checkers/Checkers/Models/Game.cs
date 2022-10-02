@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Windows; // SOLID?
+using System.Collections.Generic; // SOLID?
 
 namespace Checkers.Models;
 
