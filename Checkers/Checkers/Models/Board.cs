@@ -308,4 +308,33 @@ public class Board
 
         _board[VisualRow2BoardRow(visRowFrom)][VisualColumn2BoardColumn(visColumnFrom)] = null;
     }
+
+    public void DeleteFigure(char visualColumn, int visualRow)
+    {
+        _board[VisualRow2BoardRow(visualRow)][VisualColumn2BoardColumn(visualColumn)] = null;
+    }
+
+    public Tuple<char, int> GetKilledFiguresCell(char visColumnFrom, int visRowFrom, char visColumnTo, int visRowTo)
+    {
+        char killedColumn = 'a';
+        int killedRow = 1;
+        
+        if (Cell(visColumnFrom, visRowFrom) != null)
+        {
+            if (Cell(visColumnFrom, visRowFrom)!.GetStatus() == Status.Checker)
+            {
+                killedColumn = BoardColumn2VisualColumn((VisualColumn2BoardColumn(visColumnTo) -
+                                                         VisualColumn2BoardColumn(visColumnFrom)) / 2 +
+                                                        VisualColumn2BoardColumn(visColumnFrom));
+                killedRow = BoardRow2VisualRow((VisualRow2BoardRow(visRowTo) - VisualRow2BoardRow(visRowFrom)) / 2 + 
+                                                VisualRow2BoardRow(visRowFrom));
+            }
+            else
+            {
+                // todo if it's a queen
+            }
+        }
+
+        return new Tuple<char, int>(killedColumn, killedRow);
+    }
 }

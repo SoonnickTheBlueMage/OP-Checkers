@@ -83,8 +83,6 @@ public class Game
                     command += line.Item1.ToString() + line.Item2.ToString() + " ";
             command = command[..^1];
 
-            MessageBox.Show(possibleBasicMoves.Count.ToString());
-            
             return new List<string> {"unmark_cells", $"select_figure: {cellColumn}{cellRow}", command};
         }
         else
@@ -103,29 +101,59 @@ public class Game
             var possibleBasicMoves = _gameBoard.FigureCanBasicMove(_picked.Item1, _picked.Item2);
             var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
             
-            _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
-            
             if (possibleAttacks.Count > 0)
             {
                 if (! possibleAttacks.Contains(new Tuple<char, int>(cellColumn, cellRow)))
                     return new List<string>();
+
+                var killed = _gameBoard.GetKilledFiguresCell(
+                    _picked.Item1, _picked.Item2, cellColumn, cellRow);
+
+                var moveCommand = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
+
+                _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
+
+                var killCommand = $"erase: {killed.Item1}{killed.Item2}";
                 
-                // delete checkers we came through
-                var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
+                _gameBoard.DeleteFigure(killed.Item1, killed.Item2);
+                
                 _picked = new Tuple<char, int>(cellColumn, cellRow);
 
-                return new List<string> {"unmark_cells", command};
-            }
-            else
-            {
-                if (! possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
-                    return new List<string>();
+                if (_turnColor == Color.White)
+                {
+                    _blackFigures--;
+                }
+                else
+                {
+                    _whiteFigures--;
+                }
                 
-                var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
-                NextTurn();
+                var showCommand = "mark_cells: ";
+                foreach (var line in _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor))
+                    showCommand += line.Item1.ToString() + line.Item2.ToString() + " ";
+                showCommand = showCommand[..^1];
 
-                return new List<string> {"unmark_cells", command, "unselect", DrawPossiblePickCommand()};
+                if (_gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor).Count == 0)
+                {
+                    NextTurn();
+                    return new List<string> {"unmark_cells", moveCommand, killCommand, "unselect", DrawPossiblePickCommand()};
+                }
+
+                return new List<string> {"unmark_cells", moveCommand, killCommand, showCommand};
             }
+
+            if (!possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
+                return new List<string>();
+
+            _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
+                
+            if (! possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
+                return new List<string>();
+                
+            var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor}";
+            NextTurn();
+
+            return new List<string> {"unmark_cells", command, "unselect", DrawPossiblePickCommand()};
         }
     }
 }

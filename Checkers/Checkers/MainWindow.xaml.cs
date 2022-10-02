@@ -129,7 +129,8 @@ namespace Checkers
 
         private void Execute(string command)
         {
-            MessageBox.Show(command);
+            //MessageBox.Show(command);
+            
             if (command.Contains("message:"))
             {
                 MessageBox.Show(command.Remove(0, 9));
@@ -171,6 +172,8 @@ namespace Checkers
             if (command.Contains("mark_cells:"))
             {
                 var line = command.Remove(0, 12).Split(" ");
+                
+                if (line.Length == 0) return;
 
                 foreach (var name in line)
                 {
@@ -209,14 +212,7 @@ namespace Checkers
                 var nameTo = line[2];
                 var color = line[3];
 
-                for (int i = GridBoard.Children.Count - 1; i >= 0; --i)
-                {
-                    if (GridBoard.Children[i] is Ellipse figure && figure.Name == nameFrom)
-                    {
-                        GridBoard.Children.RemoveAt(i);
-                        break;
-                    }
-                }
+                Execute($"erase: {nameFrom}");
                 
                 Execute("unselect");
 
@@ -235,6 +231,20 @@ namespace Checkers
                 GridBoard.Children.Add(checker);
                 
                 Execute($"select_figure: {nameTo}");
+            }
+
+            if (command.Contains("erase:"))
+            {
+                var name = command.Split(" ").Last();
+
+                for (int i = GridBoard.Children.Count - 1; i >= 0; --i)
+                {
+                    if (GridBoard.Children[i] is Ellipse figure && figure.Name == name)
+                    {
+                        GridBoard.Children.RemoveAt(i);
+                        break;
+                    }
+                }
             }
         }
     }
