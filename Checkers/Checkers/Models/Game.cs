@@ -8,7 +8,7 @@ namespace Checkers.Models;
 public enum TurnStatus
 {
     WaitingFigurePick,
-    WaitingMoveToCellPick
+    WaitingCellToMovePick
 }
 
 public class Game
@@ -46,10 +46,24 @@ public class Game
         _picked = null;
     } // смена ходящего игрока
 
-    private string DrawPossibleAttackCommand(char column, int row)
+    private string DrawPossibleMoveCommand()
     {
         if (_picked == null)
-            return "";
+            return "message: no figure picked";
+
+        var possibleMoves = _gameBoard.WhereFigureCanMove(_picked.Item1, _picked.Item2);
+        var command = "mark_cells: ";
+
+        foreach (var line in possibleMoves)
+            command += line.Item1 + line.Item2.ToString() + " ";
+
+        return command[..^1];
+    }
+
+    private string DrawPossibleAttackCommand()
+    {
+        if (_picked == null)
+            return "message: no figure picked";
 
         var possibleAttacks = _gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2);
         var command = "mark_cells: ";
@@ -62,10 +76,10 @@ public class Game
 
     public string DrawPossiblePickCommand()
     {
-        var possiblePick = _gameBoard.AllPossibleToPick(_turnColor);
+        var possiblePicks = _gameBoard.AllPossibleToPick(_turnColor);
         var command = "mark_cells: ";
 
-        foreach (var line in possiblePick)
+        foreach (var line in possiblePicks)
             command += line.Item1 + line.Item2.ToString() + " ";
 
         return command[..^1];
@@ -84,17 +98,13 @@ public class Game
                 return new List<string>();
 
             _picked = new Tuple<char, int>(cellColumn, cellRow);
-            _turnStatus = TurnStatus.WaitingMoveToCellPick;
+            _turnStatus = TurnStatus.WaitingCellToMovePick;
 
-            var possibleBasicMoves = _gameBoard.WhereFigureCanMove(_picked.Item1, _picked.Item2);
-            var possibleAttacks = _gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2);
+            var command = _gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2).Count > 0
+                ? DrawPossibleAttackCommand()
+                : DrawPossibleMoveCommand();
 
-            var command = "mark_cells: ";
-            foreach (var line in possibleAttacks.Count > 0 ? possibleAttacks : possibleBasicMoves)
-                command += line.Item1 + line.Item2.ToString() + " ";
-            command = command[..^1];
-
-            return new List<string> {"unmark_cells", $"select_figure: {cellColumn}{cellRow}", command};
+            return new List<string> {"unmark_cells", $"select_figure: {_picked.Item1}{_picked.Item2}", command};
         }
         else
         {
@@ -110,8 +120,9 @@ public class Game
                 return new List<string>();
 
             var transform = false;
-            var possibleBasicMoves = _gameBoard.WhereFigureCanMove(_picked.Item1, _picked.Item2);
+            var possibleMoves = _gameBoard.WhereFigureCanMove(_picked.Item1, _picked.Item2);
             var possibleAttacks = _gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2);
+            var returnCommandList = new List<string>();
 
             if (possibleAttacks.Count > 0)
             {
@@ -135,25 +146,29 @@ public class Game
                 else
                     _whiteFigures--;
 
-                var returnCommandList = new List<string> {"unmark_cells", moveCommand, killCommand};
+                returnCommandList.Add("unmark_cells");
+                returnCommandList.Add(moveCommand);
+                returnCommandList.Add(killCommand);
 
                 if (transform) returnCommandList.Add($"transform: {_picked.Item1}{_picked.Item2} {_turnColor}");
 
                 if (_gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2).Count == 0)
                 {
                     NextTurn();
+
                     returnCommandList.Add("unselect");
                     returnCommandList.Add(DrawPossiblePickCommand());
                 }
                 else
                 {
-                    returnCommandList.Add(DrawPossibleAttackCommand(_picked.Item1, _picked.Item2));
+                    returnCommandList.Add(DrawPossibleAttackCommand());
                 }
 
                 return returnCommandList;
             }
 
-            if (!possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
+
+            if (!possibleMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
                 return new List<string>();
 
             var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor} " +
@@ -161,18 +176,17 @@ public class Game
 
             transform = _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
 
-            if (!possibleBasicMoves.Contains(new Tuple<char, int>(cellColumn, cellRow)))
-                return new List<string>();
+            returnCommandList.Add("unmark_cells");
+            returnCommandList.Add(command);
+            returnCommandList.Add("unselect");
 
-            var returnCommands = new List<string> {"unmark_cells", command, "unselect"};
-
-            if (transform) returnCommands.Add($"transform: {cellColumn}{cellRow} {_turnColor}");
+            if (transform) returnCommandList.Add($"transform: {cellColumn}{cellRow} {_turnColor}");
 
             NextTurn();
 
-            returnCommands.Add(DrawPossiblePickCommand());
+            returnCommandList.Add(DrawPossiblePickCommand());
 
-            return returnCommands;
+            return returnCommandList;
         }
     }
 }
