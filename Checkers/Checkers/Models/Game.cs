@@ -51,7 +51,7 @@ public class Game
         if (_picked == null)
             return "";
 
-        var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
+        var possibleAttacks = _gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2);
         var command = "mark_cells: ";
 
         foreach (var line in possibleAttacks)
@@ -86,8 +86,8 @@ public class Game
             _picked = new Tuple<char, int>(cellColumn, cellRow);
             _turnStatus = TurnStatus.WaitingMoveToCellPick;
 
-            var possibleBasicMoves = _gameBoard.FigureCanBasicMove(_picked.Item1, _picked.Item2);
-            var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
+            var possibleBasicMoves = _gameBoard.WhereFigureCanMove(_picked.Item1, _picked.Item2);
+            var possibleAttacks = _gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2);
 
             var command = "mark_cells: ";
             foreach (var line in possibleAttacks.Count > 0 ? possibleAttacks : possibleBasicMoves)
@@ -110,8 +110,8 @@ public class Game
                 return new List<string>();
 
             var transform = false;
-            var possibleBasicMoves = _gameBoard.FigureCanBasicMove(_picked.Item1, _picked.Item2);
-            var possibleAttacks = _gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor);
+            var possibleBasicMoves = _gameBoard.WhereFigureCanMove(_picked.Item1, _picked.Item2);
+            var possibleAttacks = _gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2);
 
             if (possibleAttacks.Count > 0)
             {
@@ -139,7 +139,7 @@ public class Game
 
                 if (transform) returnCommandList.Add($"transform: {_picked.Item1}{_picked.Item2} {_turnColor}");
 
-                if (_gameBoard.FigureCanAttack(_picked.Item1, _picked.Item2, _turnColor).Count == 0)
+                if (_gameBoard.WhereFigureCanAttack(_picked.Item1, _picked.Item2).Count == 0)
                 {
                     NextTurn();
                     returnCommandList.Add("unselect");

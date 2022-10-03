@@ -33,8 +33,8 @@ public class Figure
         return _status;
     }
 
-    public void SetStatus(Status status)
+    public void TransformToQueen()
     {
-        _status = status;
+        _status = Status.Queen;
     }
 }
