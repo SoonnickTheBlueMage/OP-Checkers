@@ -8,7 +8,8 @@ namespace Checkers.Models;
 public enum TurnStatus
 {
     WaitingFigurePick,
-    WaitingCellToMovePick
+    WaitingCellToMovePick,
+    MultiAttack
 }
 
 public class Game
@@ -108,7 +109,7 @@ public class Game
         }
         else
         {
-            if (new Tuple<char, int>(cellColumn, cellRow).Equals(_picked))
+            if (new Tuple<char, int>(cellColumn, cellRow).Equals(_picked) && _turnStatus != TurnStatus.MultiAttack)
             {
                 _picked = null;
                 _turnStatus = TurnStatus.WaitingFigurePick;
@@ -161,6 +162,8 @@ public class Game
                 }
                 else
                 {
+                    _turnStatus = TurnStatus.MultiAttack;
+                    
                     returnCommandList.Add(DrawPossibleAttackCommand());
                 }
 
