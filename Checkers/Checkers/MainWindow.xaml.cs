@@ -27,6 +27,9 @@ public partial class MainWindow
 
     private static Tuple<char, int> ParseButtonName(string name)
     {
+        if (name == "UnDo")
+            return new Tuple<char, int>('u', 0);
+
         var column = name.First();
         var row = name.Last() - '0';
 
@@ -182,7 +185,6 @@ public partial class MainWindow
             var status = line[4];
 
             Brush fill;
-
             if (color == "White")
             {
                 if (status == "Checker")
@@ -198,9 +200,14 @@ public partial class MainWindow
                     fill = Brushes.Olive;
             }
 
-            Execute($"erase: {nameFrom}");
-
-            Execute("unselect");
+            var printTurn = new TextBlock
+            {
+                Text = $"{nameFrom} - {nameTo}",
+                FontSize = 20,
+                Foreground = fill,
+                TextAlignment = TextAlignment.Center
+            };
+            TurnLog.Children.Add(printTurn);
 
             var checker = new Ellipse
             {
@@ -210,12 +217,12 @@ public partial class MainWindow
                 IsHitTestVisible = false,
                 Name = $"{nameTo.First()}{nameTo.Last()}"
             };
-
             Grid.SetColumn(checker, nameTo.First() - 'a' + 1);
             Grid.SetRow(checker, '8' - nameTo.Last());
-
             GridBoard.Children.Add(checker);
 
+            Execute($"erase: {nameFrom}");
+            Execute("unselect");
             Execute($"select_figure: {nameTo}");
         }
 

@@ -18,6 +18,7 @@
                     <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="200" />
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
@@ -69,6 +70,17 @@
                 <TextBlock Grid.Column="6" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="f" />
                 <TextBlock Grid.Column="7" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="g" />
                 <TextBlock Grid.Column="8" Grid.Row="8" TextAlignment="Center" FontSize="25" Text="h" />
+
+                <ScrollViewer Grid.Column="9" Grid.Row="0" Grid.RowSpan="8">
+                    <StackPanel Name="TurnLog" Background="Bisque" />
+                </ScrollViewer>
+
+                <Button Grid.Row="8" Grid.Column="9" Name="UnDo" FontSize="23" BorderBrush="Black"
+                        BorderThickness="3 3 0 0">
+                    Undo
+                </Button>
+
+                <Border Grid.Row="0" Grid.RowSpan="9" Grid.Column="9" BorderBrush="Black" BorderThickness="3 0 0 0" />
 
             </Grid>
         </Border>
