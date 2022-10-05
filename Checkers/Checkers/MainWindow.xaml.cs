@@ -184,6 +184,97 @@ public partial class MainWindow
             var color = line[3];
             var status = line[4];
 
+            Execute($"draw: {nameTo} {color} {status}");
+            Execute($"erase: {nameFrom}");
+            Execute("unselect");
+            Execute($"select_figure: {nameTo}");
+        }
+
+        if (command.Contains("erase:"))
+        {
+            var line = command.Split(" ");
+            var name = line[1];
+
+            for (var i = GridBoard.Children.Count - 1; i >= 0; --i)
+                if (GridBoard.Children[i] is Ellipse figure && figure.Name == name)
+                {
+                    GridBoard.Children.RemoveAt(i);
+                    break;
+                }
+        }
+
+        if (command.Contains("transform:"))
+        {
+            var line = command.Split(" ");
+            var name = line[1];
+            var color = line[2];
+
+            for (var i = GridBoard.Children.Count - 1; i >= 0; --i)
+                if (GridBoard.Children[i] is Ellipse figure && figure.Name == name)
+                {
+                    (GridBoard.Children[i] as Ellipse)!.Fill = color == "White" ? Brushes.Teal : Brushes.Olive;
+                    break;
+                }
+        }
+
+        if (command.Contains("draw:"))
+        {
+            var line = command.Split(" ");
+            var name = line[1];
+            var color = line[2];
+            var status = line[3];
+
+            Brush fill;
+            if (color == "White")
+            {
+                if (status == "Checker")
+                    fill = Brushes.Silver;
+                else
+                    fill = Brushes.Teal;
+            }
+            else
+            {
+                if (status == "Checker")
+                    fill = Brushes.Goldenrod;
+                else
+                    fill = Brushes.Olive;
+            }
+
+            var checker = new Ellipse
+            {
+                Fill = fill,
+                Width = 40,
+                Height = 40,
+                IsHitTestVisible = false,
+                Name = $"{name.First()}{name.Last()}"
+            };
+            Grid.SetColumn(checker, name.First() - 'a' + 1);
+            Grid.SetRow(checker, '8' - name.Last());
+            GridBoard.Children.Add(checker);
+        }
+
+        if (command.Contains("transformBack:"))
+        {
+            var line = command.Split(" ");
+            var name = line[1];
+            var color = line[2];
+
+            for (var i = GridBoard.Children.Count - 1; i >= 0; --i)
+                if (GridBoard.Children[i] is Ellipse figure && figure.Name == name)
+                {
+                    (GridBoard.Children[i] as Ellipse)!.Fill = color == "Teal" ? Brushes.Silver : Brushes.Goldenrod;
+                    break;
+                }
+        }
+
+        if (command.Contains("log:"))
+        {
+            var line = command.Split(" ");
+            var nameFrom = line[1];
+            var nameTo = line[2];
+            var color = line[3];
+            var status = line[4];
+
             Brush fill;
             if (color == "White")
             {
@@ -208,48 +299,8 @@ public partial class MainWindow
                 TextAlignment = TextAlignment.Center
             };
             TurnLog.Children.Add(printTurn);
-
-            var checker = new Ellipse
-            {
-                Fill = fill,
-                Width = 40,
-                Height = 40,
-                IsHitTestVisible = false,
-                Name = $"{nameTo.First()}{nameTo.Last()}"
-            };
-            Grid.SetColumn(checker, nameTo.First() - 'a' + 1);
-            Grid.SetRow(checker, '8' - nameTo.Last());
-            GridBoard.Children.Add(checker);
-
-            Execute($"erase: {nameFrom}");
-            Execute("unselect");
-            Execute($"select_figure: {nameTo}");
         }
 
-        if (command.Contains("erase:"))
-        {
-            var name = command.Split(" ").Last();
-
-            for (var i = GridBoard.Children.Count - 1; i >= 0; --i)
-                if (GridBoard.Children[i] is Ellipse figure && figure.Name == name)
-                {
-                    GridBoard.Children.RemoveAt(i);
-                    break;
-                }
-        }
-
-        if (command.Contains("transform:"))
-        {
-            var line = command.Split(" ");
-            var name = line[1];
-            var color = line[2];
-
-            for (var i = GridBoard.Children.Count - 1; i >= 0; --i)
-                if (GridBoard.Children[i] is Ellipse figure && figure.Name == name)
-                {
-                    (GridBoard.Children[i] as Ellipse)!.Fill = color == "White" ? Brushes.Teal : Brushes.Olive;
-                    break;
-                }
-        }
+        if (command.Contains("delete_last_log")) TurnLog.Children.RemoveAt(TurnLog.Children.Count - 1);
     }
 }

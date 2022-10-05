@@ -520,6 +520,14 @@ public class Board
         _board[VisRow2BoardRow(visRow)][VisCol2BoardCol(visCol)] = null;
     }
 
+    public void AddFigure(char visCol, int visRow, Color color, Status status)
+    {
+        _board[VisRow2BoardRow(visRow)][VisCol2BoardCol(visCol)] = new Figure(color);
+
+        if (status == Status.Queen)
+            _board[VisRow2BoardRow(visRow)][VisCol2BoardCol(visCol)]!.TransformToQueen();
+    }
+
     public Tuple<char, int> GetKilledFiguresCell(char visColumnFrom, int visRowFrom, char visColumnTo, int visRowTo)
     {
         // использовать до MoveFigure и DeleteFigure !!!

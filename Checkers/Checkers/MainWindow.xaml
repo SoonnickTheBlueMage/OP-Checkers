@@ -76,7 +76,8 @@
                 </ScrollViewer>
 
                 <Button Grid.Row="8" Grid.Column="9" Name="UnDo" FontSize="23" BorderBrush="Black"
-                        BorderThickness="3 3 0 0">
+                        BorderThickness="3 3 0 0"
+                        Click="ButtonClick">
                     Undo
                 </Button>
 
