@@ -2,3 +2,5 @@
 ## Проект 1: игра в шашки
 
 [Постановка задачи](./TASK.md)
+<br/>
+[Документация](./Checkers/Checkers/Documentation.md)
