@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 
-// нарушение SOLID?
-
 namespace Checkers.Models;
 
 /*
- * этот класс используется для выполнения всех проверок и перемешений
- * он полностью соответствует тому что рисуется в окне, но
- * все операции надо выполнять как в нем, так и в grid окна
+ *  Этот класс используется для выполнения всех проверок и перемещений.
+ *  Он полностью соответствует тому что рисуется на доске в окне, но
+ *  все операции надо выполнять как в нем, так и в grid окна.
  *
- * индекс рядов в этом классе совпадает с grid
- * индекс колонн в этом классе на 1 меньше чем в grid
- */
-/*
+ *  Индекс рядов в этом классе совпадает с grid.
+ *  Индекс колонн в этом классе на 1 меньше чем в grid
+ *
+ *
  *  Board Coordinates               Visual Coordinates
- *  horizontal - column
- *  vertical - row
+ *  (координаты _board)         (координаты - имена кнопок) 
+ *                                vertical (a-h) - column
+ *                                horizontal (1-8) - row
  * 
  *      01234567                          abcdefgh
  *    7 _b_b_b_b                        8 _b_b_b_b
@@ -412,7 +411,7 @@ public class Board
         return _board[VisRow2BoardRow(visRow)][VisCol2BoardCol(visCol)];
     }
 
-    public List<Tuple<char, int>> AllPossibleToPick(Color playingColor)
+    public List<Tuple<char, int>> AllPossibleToPick(Color playingColor) // кем можно ходить (учитывая "бить обязан")
     {
         var basicMoves = new List<Tuple<char, int>>();
         var mustAttack = new List<Tuple<char, int>>();
@@ -485,7 +484,7 @@ public class Board
 
     public bool MoveFigure(char visColumnFrom, int visRowFrom, char visColumnTo, int visRowTo)
     {
-        // перед использованием выполнить все необходимые проверки логики
+        // Перед использованием выполнить все необходимые проверки логики.
 
         if (Cell(visColumnFrom, visRowFrom) == null || Cell(visColumnTo, visRowTo) != null)
             return false;
@@ -530,9 +529,9 @@ public class Board
 
     public Tuple<char, int> GetKilledFiguresCell(char visColumnFrom, int visRowFrom, char visColumnTo, int visRowTo)
     {
-        // использовать до MoveFigure и DeleteFigure !!!
-        // неправильно использование ведет к падению кода в 100% случаев, поэтому
-        // применять с гарантированно верными параметрами, в нужном месте
+        // Использовать до MoveFigure и DeleteFigure !!!
+        // Неправильное использование ведет к падению кода, поэтому
+        // применять с гарантированно верными параметрами, в нужном месте, чтобы не было ссылок на пустоту.
 
         var killedColumn = 'a';
         var killedRow = 1;

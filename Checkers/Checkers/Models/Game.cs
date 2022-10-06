@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// SOLID?
-
 namespace Checkers.Models;
+
+/*
+ * Этот класс обеспечивает связь между Board и окном.
+ * Он принимает имя нажимаемой кнопки, обрабатывает его в зависимости от состояния игры,
+ * делает запросы классу Board и возвращает список текстовых команд отрисовки.
+ */
 
 public enum TurnStatus
 {
@@ -21,7 +25,7 @@ public class Game
     private Color _turnColor;
     private TurnStatus _turnStatus;
     private int _whiteFigures;
-    private List<List<string>> _turnLogger;
+    private readonly List<List<string>> _turnLogger; // логгирует команды отрисовки
 
     public Game()
     {
@@ -32,21 +36,21 @@ public class Game
         _turnStatus = TurnStatus.WaitingFigurePick;
         _picked = null;
         _turnLogger = new List<List<string>> {new()};
-    } // constructor
+    }
 
-    //нет правила про то что надо бить большинство
+    // нет правила про то, что надо бить большинство
 
     private bool GameContinues()
     {
         return _whiteFigures > 0 && _blackFigures > 0;
-    } //игра не закончилась?
+    }
 
-    private void NextTurn()
+    private void NextTurn() // смена ходящего игрока 
     {
         _turnColor = _turnColor == Color.White ? Color.Black : Color.White;
         _turnStatus = TurnStatus.WaitingFigurePick;
         _picked = null;
-    } // смена ходящего игрока
+    }
 
     private void Log(string command)
     {
@@ -56,6 +60,7 @@ public class Game
             _turnLogger.Last().Add(command);
     }
 
+    // UndoTurn() откатывает ход по командам отрисовки прошлого хода и возвращает нужные для этого команды отрисовки
     private List<string> UndoTurn()
     {
         if (_turnLogger.Count == 1)
@@ -178,6 +183,9 @@ public class Game
         if (_turnStatus == TurnStatus.WaitingFigurePick)
         {
             var possiblePick = _gameBoard.AllPossibleToPick(_turnColor);
+            
+            if (possiblePick.Count == 0)
+                return new List<string> {$"message: Game over, {(_turnColor == Color.White ? "Black win" : "White win")}"};
 
             if (!possiblePick.Contains(new Tuple<char, int>(cellColumn, cellRow)))
                 return new List<string>();
@@ -219,16 +227,16 @@ public class Game
 
                 var moveCommand = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor} " +
                                   $"{_gameBoard.Cell(_picked.Item1, _picked.Item2)!.GetStatus()}";
-                // this will get Null Ref Exc if it would be used after _gameBoard.MoveFigure or  _gameBoard.DeleteFigure
+                // использовать до _gameBoard.MoveFigure и _gameBoard.DeleteFigure во избежание ссылок на пустоту
 
                 var logCommand = $"log: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor} " +
                                  $"{_gameBoard.Cell(_picked.Item1, _picked.Item2)!.GetStatus()}";
-                // this will get Null Ref Exc if it would be used after _gameBoard.MoveFigure or  _gameBoard.DeleteFigure
+                // использовать до _gameBoard.MoveFigure и _gameBoard.DeleteFigure во избежание ссылок на пустоту
 
                 var killCommand = $"erase: {killed.Item1}{killed.Item2} " +
                                   $"{_gameBoard.Cell(killed.Item1, killed.Item2)!.GetColor()} " +
                                   $"{_gameBoard.Cell(killed.Item1, killed.Item2)!.GetStatus()}";
-                // this will get Null Ref Exc if it would be used after  _gameBoard.MoveFigure or _gameBoard.DeleteFigure
+                // использовать до _gameBoard.MoveFigure и _gameBoard.DeleteFigure во избежание ссылок на пустоту
 
                 transform = _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
                 _gameBoard.DeleteFigure(killed.Item1, killed.Item2);
@@ -257,7 +265,10 @@ public class Game
                     NextTurn();
 
                     returnCommandList.Add("unselect");
-                    returnCommandList.Add(DrawPossiblePickCommand());
+                    returnCommandList.Add(DrawPossiblePickCommand()); // после NextTurn(), иначе не сменится цвет
+                    
+                    if (!GameContinues())
+                        returnCommandList.Add($"message: Game over, {(_whiteFigures == 0 ? "Black win" : "White win")}");
 
                     Log("change_color");
                 }
@@ -278,11 +289,11 @@ public class Game
 
             var command = $"move: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor} " +
                           $"{_gameBoard.Cell(_picked.Item1, _picked.Item2)!.GetStatus()}";
-            // this will get Null Ref Exc if it would be used after _gameBoard.MoveFigure
+            // использовать до _gameBoard.MoveFigure во избежание ссылок на пустоту
 
             var logCom = $"log: {_picked.Item1}{_picked.Item2} {cellColumn}{cellRow} {_turnColor} " +
                          $"{_gameBoard.Cell(_picked.Item1, _picked.Item2)!.GetStatus()}";
-            // this will get Null Ref Exc if it would be used after _gameBoard.MoveFigure
+            // использовать до _gameBoard.MoveFigure во избежание ссылок на пустоту
 
             transform = _gameBoard.MoveFigure(_picked.Item1, _picked.Item2, cellColumn, cellRow);
 
@@ -299,7 +310,7 @@ public class Game
 
             NextTurn();
 
-            returnCommandList.Add(DrawPossiblePickCommand());
+            returnCommandList.Add(DrawPossiblePickCommand()); // после NextTurn(), иначе не сменится цвет
 
             Log("change_color");
             Log("new_turn");

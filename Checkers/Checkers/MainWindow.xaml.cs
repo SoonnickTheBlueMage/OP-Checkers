@@ -13,6 +13,12 @@ namespace Checkers;
 /// </summary>
 public partial class MainWindow
 {
+    /*
+     * Этот код отвечает за отрисовку того, что скажет рисовать класс Game.
+     * Коммуникация между ними происходит так:
+     * по нажатию кнопки возвращается список команд, которые надо выполнить (отрисовать).
+     */
+
     private static readonly Game CurrentGame = new();
 
     public MainWindow()
@@ -34,7 +40,7 @@ public partial class MainWindow
         var row = name.Last() - '0';
 
         return new Tuple<char, int>(column, row);
-    } // to visual coords
+    } // имя кнопки в визуальные координаты
 
     private void ButtonClick(object sender, RoutedEventArgs e)
     {
@@ -112,8 +118,6 @@ public partial class MainWindow
 
     private void Execute(string command)
     {
-        //MessageBox.Show(command);
-
         if (command.Contains("message:")) MessageBox.Show(command.Remove(0, 9));
 
         if (command.Contains("select_figure:"))
