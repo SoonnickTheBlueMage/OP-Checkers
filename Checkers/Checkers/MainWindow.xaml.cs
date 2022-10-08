@@ -19,7 +19,7 @@ public partial class MainWindow
      * по нажатию кнопки возвращается список команд, которые надо выполнить (отрисовать).
      */
 
-    private static readonly Game CurrentGame = new();
+    private static Game _currentGame = new();
 
     public MainWindow()
     {
@@ -28,7 +28,7 @@ public partial class MainWindow
         CreateTable();
         AddCheckers();
 
-        Execute(CurrentGame.DrawPossiblePickCommand());
+        Execute(_currentGame.DrawPossiblePickCommand());
     }
 
     private static Tuple<char, int> ParseButtonName(string name)
@@ -50,10 +50,21 @@ public partial class MainWindow
             return;
         }
 
+        if (pressedButton.Name == "Restart")
+        {
+            Execute("unmark_cells");
+            Execute("unselect");
+            Execute("erase_all");
+            AddCheckers();
+            _currentGame = new Game();
+            Execute(_currentGame.DrawPossiblePickCommand());
+            return;
+        }
+
         var cellColumn = ParseButtonName(pressedButton.Name).Item1;
         var cellRow = ParseButtonName(pressedButton.Name).Item2;
 
-        var todo = CurrentGame.Turn(cellColumn, cellRow);
+        var todo = _currentGame.Turn(cellColumn, cellRow);
 
         foreach (var line in todo) Execute(line);
     }
@@ -205,6 +216,15 @@ public partial class MainWindow
                     GridBoard.Children.RemoveAt(i);
                     break;
                 }
+        }
+
+        if (command.Contains("erase_all"))
+        {
+            for (var i = GridBoard.Children.Count - 1; i >= 0; --i)
+                if (GridBoard.Children[i] is Ellipse)
+                    GridBoard.Children.RemoveAt(i);
+
+            TurnLog.Children.Clear();
         }
 
         if (command.Contains("transform:"))

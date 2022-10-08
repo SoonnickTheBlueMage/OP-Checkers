@@ -81,6 +81,12 @@
                     Undo
                 </Button>
 
+                <Button Grid.Row="8" Grid.Column="0" Name="Restart" FontSize="20" BorderBrush="Black"
+                        BorderThickness="0 3 3 0"
+                        Click="ButtonClick">
+                    R
+                </Button>
+
                 <Border Grid.Row="0" Grid.RowSpan="9" Grid.Column="9" BorderBrush="Black" BorderThickness="3 0 0 0" />
 
             </Grid>
